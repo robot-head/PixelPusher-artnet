@@ -29,15 +29,15 @@ public class ArtNetMapping {
     while (totalPixelsLeftToMap > 0) {
       // set current pixel's mapping
       System.out.println("ArtNet: [" + currentUniverse + ", " + currentChannel
-          +"] -> PixelPusher: ["+currentStrip+", "+currentPixel+"]");
+          + "] -> PixelPusher: [" + currentStrip + ", " + currentPixel + "]");
       mapping.put(new ArtNetLocation(currentUniverse, currentChannel),
-          new PixelPusherLocation(currentStrip, currentPixel,
+          new PixelPusherLocation(pusher.getStrip(currentStrip), currentPixel,
               PixelPusherLocation.Channel.RED));
       mapping.put(new ArtNetLocation(currentUniverse, currentChannel + 1),
-          new PixelPusherLocation(currentStrip, currentPixel,
+          new PixelPusherLocation(pusher.getStrip(currentStrip), currentPixel,
               PixelPusherLocation.Channel.GREEN));
       mapping.put(new ArtNetLocation(currentUniverse, currentChannel + 2),
-          new PixelPusherLocation(currentStrip, currentPixel,
+          new PixelPusherLocation(pusher.getStrip(currentStrip), currentPixel,
               PixelPusherLocation.Channel.BLUE));
 
       // increment pixelpusher pixel index

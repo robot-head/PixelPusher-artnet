@@ -55,7 +55,6 @@ public class ArtNetReceiver extends Thread {
       e.printStackTrace();
       return;
     }
-    // TODO Auto-generated method stub
     while (true) {
       try {
         socket.receive(packet);

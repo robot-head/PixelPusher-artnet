@@ -1,7 +1,9 @@
 package com.heroicrobot.pixelpusher.artnet;
 
+import com.heroicrobot.dropbit.devices.pixelpusher.Strip;
+
 public class PixelPusherLocation {
-  private int strip;
+  private Strip strip;
   private int pixel;
   private Channel channel;
 
@@ -9,7 +11,7 @@ public class PixelPusherLocation {
     RED, GREEN, BLUE, ORANGE, WHITE
   }
 
-  public PixelPusherLocation(int strip, int pixel, Channel channel) {
+  public PixelPusherLocation(Strip strip, int pixel, Channel channel) {
     this.strip = strip;
     this.pixel = pixel;
     this.channel = channel;
@@ -18,14 +20,14 @@ public class PixelPusherLocation {
   /**
    * @return the strip
    */
-  public int getStrip() {
+  public Strip getStrip() {
     return strip;
   }
 
   /**
    * @param strip the strip to set
    */
-  public void setStrip(int strip) {
+  public void setStrip(Strip strip) {
     this.strip = strip;
   }
 
