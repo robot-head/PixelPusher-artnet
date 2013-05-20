@@ -22,28 +22,27 @@ public class ArtNetReceiver extends Thread {
   private void update_channel(int universe, int channel, int value) {
     // System.out.println("Universe " + universe + " channel " + channel
     // + " value " + value);
-    byte colorComponent = 0;
     try {
       PixelPusherLocation loc = observer.mapping.getPixelPusherLocation(
           universe, channel);
       // TODO: Extract color component from value
       switch (loc.getChannel()) {
         case RED:
-          loc.getStrip().setPixelRed(colorComponent, loc.getPixel());
+          loc.getStrip().setPixelRed((byte) value, loc.getPixel());
           break;
         case GREEN:
-          loc.getStrip().setPixelGreen(colorComponent, loc.getPixel());
+          loc.getStrip().setPixelGreen((byte) value, loc.getPixel());
           break;
         case BLUE:
-          loc.getStrip().setPixelBlue(colorComponent, loc.getPixel());
+          loc.getStrip().setPixelBlue((byte) value, loc.getPixel());
           break;
         default:
           break;
       }
 
     } catch (NullPointerException e) {
-      System.out.println("No pixel at universe " + universe + " channel "
-          + channel);
+  //      System.out.println("No pixel at universe " + universe + " channel "
+  //          + channel);
     }
   }
 

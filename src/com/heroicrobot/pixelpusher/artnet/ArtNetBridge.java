@@ -15,9 +15,10 @@ public class ArtNetBridge {
     observer = new PixelPusherObserver();
     registry = new DeviceRegistry();
     registry.addObserver(observer);
-    registry.startPushing();
-    registry.setAutoThrottle(true);
     ArtNetReceiver receiver = new ArtNetReceiver(observer);
     receiver.start();
+    registry.startPushing();
+    registry.setAutoThrottle(true);
+
   }
 }
