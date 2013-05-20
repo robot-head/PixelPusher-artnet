@@ -21,8 +21,8 @@ public class ArtNetReceiver extends Thread {
   }
 
   private void update_channel(int universe, int channel, int value) {
-//    System.out.println("Universe " + universe + " channel " + channel
-//        + " value " + value);
+    // System.out.println("Universe " + universe + " channel " + channel
+    // + " value " + value);
     byte colorComponent = 0;
     try {
       PixelPusherLocation loc = observer.mapping.getPixelPusherLocation(
@@ -43,7 +43,8 @@ public class ArtNetReceiver extends Thread {
       }
 
     } catch (NullPointerException e) {
-      e.printStackTrace();
+      System.out.println("No pixel at universe " + universe + " channel "
+          + channel);
     }
   }
 
@@ -59,7 +60,7 @@ public class ArtNetReceiver extends Thread {
       int universe = (buf[14] | (buf[15] << 8)) + 1;
       for (int i = 0; i < 512; i++) {
         // the channel data is in buf[i+17];
-        update_channel(universe, i+1, buf[i + 17]);
+        update_channel(universe, i + 1, buf[i + 17]);
       }
 
     } else {
@@ -87,7 +88,7 @@ public class ArtNetReceiver extends Thread {
         parseArtnetPacket(packet);
         if (packetno % 100 == 0)
           System.out.println("Got a packet");
-          //System.out.println(Arrays.toString(packet.getData()));
+        // System.out.println(Arrays.toString(packet.getData()));
         packetno++;
       } catch (IOException e) {
         e.printStackTrace();
