@@ -25,6 +25,8 @@ public class ArtNetMapping {
     for (PixelPusher pusher : pushers) {
       int startingChannel = pusher.getArtnetChannel();
       int startingUniverse = pusher.getArtnetUniverse();
+      if (startingChannel == 0 && startingUniverse == 0)
+        continue;
       int numberOfStrips = pusher.getNumberOfStrips();
       int pixelsPerStrip = pusher.getPixelsPerStrip();
       int currentUniverse = startingUniverse;

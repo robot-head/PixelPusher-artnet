@@ -3,7 +3,6 @@ package com.heroicrobot.pixelpusher.artnet;
 import java.util.Observable;
 import java.util.Observer;
 
-import com.heroicrobot.dropbit.devices.pixelpusher.PixelPusher;
 import com.heroicrobot.dropbit.registry.DeviceRegistry;
 
 class PixelPusherObserver implements Observer {
