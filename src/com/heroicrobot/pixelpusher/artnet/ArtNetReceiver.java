@@ -12,30 +12,53 @@ public class ArtNetReceiver extends Thread {
       0x74, 0x0 };
 
   byte[] buf;
+  PixelPusherObserver observer;
 
-  public ArtNetReceiver() {
+  public ArtNetReceiver(PixelPusherObserver observer) {
+    this.observer = observer;
     buf = new byte[576];
   }
 
   private void update_channel(int universe, int channel, int value) {
+    byte colorComponent = 0;
+    try {
+      PixelPusherLocation loc = observer.mapping.getPixelPusherLocation(
+          universe, channel);
+      // TODO: Extract color component from value
+      switch (loc.getChannel()) {
+        case RED:
+          loc.getStrip().setPixelRed(colorComponent, loc.getPixel());
+          break;
+        case GREEN:
+          loc.getStrip().setPixelGreen(colorComponent, loc.getPixel());
+          break;
+        case BLUE:
+          loc.getStrip().setPixelBlue(colorComponent, loc.getPixel());
+          break;
+        default:
+          break;
+      }
 
+    } catch (NullPointerException e) {
+      e.printStackTrace();
+    }
   }
 
   private void parseArtnetPacket(DatagramPacket packet) {
     buf = packet.getData();
-    for (int i=0; header[i]>0; i++) {
+    for (int i = 0; header[i] > 0; i++) {
       if (header[i] != buf[i])
         return;
     }
     // If we get here, it looks like there's a packet to handle.
     if (buf[8] == 0x50 && buf[9] == 0x00) {
       // Opcode 0x5000 is DMX data
-      int universe = buf[14] & (buf[15]<<8);
+      int universe = buf[14] & (buf[15] << 8);
 
-         for(int i=0; i< 512; i++) {
-           // the channel data is in buf[i+17];
-           update_channel(universe, i, buf[i+17]);
-         }
+      for (int i = 0; i < 512; i++) {
+        // the channel data is in buf[i+17];
+        update_channel(universe, i, buf[i + 17]);
+      }
 
     } else {
       return;

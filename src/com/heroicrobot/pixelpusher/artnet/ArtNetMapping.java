@@ -16,6 +16,11 @@ public class ArtNetMapping {
     mapping = new HashMap<ArtNetLocation, PixelPusherLocation>();
   }
 
+  public PixelPusherLocation getPixelPusherLocation(int universe, int channel) {
+    ArtNetLocation loc = new ArtNetLocation(universe, channel);
+    return this.mapping.get(loc);
+  }
+
   public void GenerateMapping(List<PixelPusher> pushers) {
     for (PixelPusher pusher : pushers) {
       int startingChannel = pusher.getArtnetChannel();

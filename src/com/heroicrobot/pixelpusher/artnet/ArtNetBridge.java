@@ -1,6 +1,5 @@
 package com.heroicrobot.pixelpusher.artnet;
 
-
 import com.heroicrobot.dropbit.registry.DeviceRegistry;
 
 public class ArtNetBridge {
@@ -9,10 +8,6 @@ public class ArtNetBridge {
   static DeviceRegistry registry;
   boolean hasStrips;
 
-
-  public static void PushArtnetBuffer() {
-    // implement
-  }
   /**
    * @param args
    */
@@ -20,11 +15,9 @@ public class ArtNetBridge {
     observer = new PixelPusherObserver();
     registry = new DeviceRegistry();
     registry.addObserver(observer);
-    while (true) {
-      if (observer.hasStrips) {
-        PushArtnetBuffer();
-      }
-    }
+    registry.startPushing();
+    registry.setAutoThrottle(true);
+    ArtNetReceiver receiver = new ArtNetReceiver(observer);
+    receiver.start();
   }
-
 }

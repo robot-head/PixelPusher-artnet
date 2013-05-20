@@ -7,7 +7,7 @@ public class PixelPusherLocation {
   private int pixel;
   private Channel channel;
 
-  public enum Channel{
+  public enum Channel {
     RED, GREEN, BLUE, ORANGE, WHITE
   }
 
@@ -25,7 +25,8 @@ public class PixelPusherLocation {
   }
 
   /**
-   * @param strip the strip to set
+   * @param strip
+   *          the strip to set
    */
   public void setStrip(Strip strip) {
     this.strip = strip;
@@ -39,7 +40,8 @@ public class PixelPusherLocation {
   }
 
   /**
-   * @param pixel the pixel to set
+   * @param pixel
+   *          the pixel to set
    */
   public void setPixel(int pixel) {
     this.pixel = pixel;
@@ -53,7 +55,8 @@ public class PixelPusherLocation {
   }
 
   /**
-   * @param channel the channel to set
+   * @param channel
+   *          the channel to set
    */
   public void setChannel(Channel channel) {
     this.channel = channel;
