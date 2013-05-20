@@ -26,10 +26,12 @@ public class ArtNetMapping {
 	 GenerateMapping(pushers, false);
   }
   
-  public void GenerateMapping(List<PixelPusher> pushers, boolean packStrips) {
+  public void GenerateMapping(List<PixelPusher> pushers, boolean pack) {
     for (PixelPusher pusher : pushers) {
       int startingChannel = pusher.getArtnetChannel();
       int startingUniverse = pusher.getArtnetUniverse();
+      System.out.println("Mapping pusher at starting universe "
+          + startingUniverse + ", starting channel: " + startingChannel);
       if (startingChannel == 0 && startingUniverse == 0)
         continue;
       int numberOfStrips = pusher.getNumberOfStrips();
@@ -64,10 +66,11 @@ public class ArtNetMapping {
         if (currentPixel == pixelsPerStrip) {
           currentPixel = 0;
           currentStrip++;
-          if (!packStrips) {
-        	  currentChannel = 1;
-        	  currentUniverse++;
-        	  continue;
+
+          if (!pack) {
+            currentChannel = 1;
+            currentUniverse++;
+            continue;
           }
         }
 

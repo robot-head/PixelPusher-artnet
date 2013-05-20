@@ -19,6 +19,6 @@ class PixelPusherObserver implements Observer {
   }
 
   private void generateMapping(DeviceRegistry registry) {
-    mapping.GenerateMapping(registry.getPushers());
+    mapping.GenerateMapping(registry.getPushers(), true);
   }
 }

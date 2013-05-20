@@ -20,6 +20,8 @@ public class ArtNetReceiver extends Thread {
   }
 
   private void update_channel(int universe, int channel, int value) {
+//    System.out.println("Universe " + universe + " channel " + channel
+//        + " value " + value);
     byte colorComponent = 0;
     try {
       PixelPusherLocation loc = observer.mapping.getPixelPusherLocation(
@@ -51,13 +53,12 @@ public class ArtNetReceiver extends Thread {
         return;
     }
     // If we get here, it looks like there's a packet to handle.
-    if (buf[8] == 0x50 && buf[9] == 0x00) {
+    if (buf[8] == 0x00 && buf[9] == 0x50) {
       // Opcode 0x5000 is DMX data
-      int universe = buf[14] & (buf[15] << 8);
-
+      int universe = (buf[14] | (buf[15] << 8)) + 1;
       for (int i = 0; i < 512; i++) {
         // the channel data is in buf[i+17];
-        update_channel(universe, i, buf[i + 17]);
+        update_channel(universe, i+1, buf[i + 17]);
       }
 
     } else {
@@ -78,10 +79,15 @@ public class ArtNetReceiver extends Thread {
       e.printStackTrace();
       return;
     }
+    int packetno = 0;
     while (true) {
       try {
         socket.receive(packet);
         parseArtnetPacket(packet);
+        if (packetno % 100 == 0)
+          System.out.println("Got a packet");
+          //System.out.println(Arrays.toString(packet.getData()));
+        packetno++;
       } catch (IOException e) {
         e.printStackTrace();
       }
