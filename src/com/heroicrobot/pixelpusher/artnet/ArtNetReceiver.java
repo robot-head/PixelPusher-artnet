@@ -58,7 +58,7 @@ public class ArtNetReceiver extends Thread {
       int universe = (buf[14] | (buf[15] << 8)) + 1;
       for (int i = 0; i < 512; i++) {
         // the channel data is in buf[i+17];
-        update_channel(universe, i + 1, buf[i + 17]);
+        update_channel(universe, i + 1, buf[i + 18]);
       }
 
     } else {
@@ -85,7 +85,7 @@ public class ArtNetReceiver extends Thread {
         socket.receive(packet);
         parseArtnetPacket(packet);
         if (packetno % 100 == 0)
-          System.out.println("Got a packet");
+//          System.out.println("Got a packet");
         // System.out.println(Arrays.toString(packet.getData()));
         packetno++;
       } catch (IOException e) {
