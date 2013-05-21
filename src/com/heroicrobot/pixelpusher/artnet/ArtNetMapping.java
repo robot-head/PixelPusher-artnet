@@ -21,11 +21,10 @@ public class ArtNetMapping {
     return this.mapping.get(loc);
   }
 
-  public void GenerateMapping(List<PixelPusher> pushers)
-  {
-	 GenerateMapping(pushers, false);
+  public void GenerateMapping(List<PixelPusher> pushers) {
+    GenerateMapping(pushers, false);
   }
-  
+
   public void GenerateMapping(List<PixelPusher> pushers, boolean pack) {
     for (PixelPusher pusher : pushers) {
       int startingChannel = pusher.getArtnetChannel();
@@ -45,8 +44,9 @@ public class ArtNetMapping {
       while (totalPixelsLeftToMap > 0) {
         // set current pixel's mapping
         System.out.println("ArtNet: [" + currentUniverse + ", "
-            + currentChannel + "] -> PixelPusher: [" + currentStrip + ", "
-            + currentPixel + "]");
+            + currentChannel + "," + (currentChannel + 1) + ","
+            + (currentChannel + 2) + "] -> PixelPusher: [" + currentStrip
+            + ", " + currentPixel + "]");
         mapping.put(new ArtNetLocation(currentUniverse, currentChannel),
             new PixelPusherLocation(pusher.getStrip(currentStrip),
                 currentPixel, PixelPusherLocation.Channel.RED));
@@ -76,7 +76,7 @@ public class ArtNetMapping {
 
         // increment artnet channel by three
         currentChannel += 3;
-        if (currentChannel > CHANNELS_PER_UNIVERSE) {
+        if (CHANNELS_PER_UNIVERSE - currentChannel < 3) {
           currentChannel = 1;
           currentUniverse++;
         }
