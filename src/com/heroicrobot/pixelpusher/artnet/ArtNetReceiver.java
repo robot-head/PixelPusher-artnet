@@ -13,36 +13,37 @@ public class ArtNetReceiver extends Thread {
 
   byte[] buf;
   PixelPusherObserver observer;
+  boolean seenPacket;
 
   public ArtNetReceiver(PixelPusherObserver observer) {
     this.observer = observer;
     buf = new byte[576];
+    this.seenPacket = false;
   }
 
   private void update_channel(int universe, int channel, int value) {
-    // System.out.println("Universe " + universe + " channel " + channel
-    // + " value " + value);
     try {
       PixelPusherLocation loc = observer.mapping.getPixelPusherLocation(
           universe, channel);
       // TODO: Extract color component from value
       switch (loc.getChannel()) {
-        case RED:
-          loc.getStrip().setPixelRed((byte) value, loc.getPixel());
-          break;
-        case GREEN:
-          loc.getStrip().setPixelGreen((byte) value, loc.getPixel());
-          break;
-        case BLUE:
-          loc.getStrip().setPixelBlue((byte) value, loc.getPixel());
-          break;
-        default:
-          break;
+      case RED:
+        loc.getStrip().setPixelRed((byte) value, loc.getPixel());
+        break;
+      case GREEN:
+        loc.getStrip().setPixelGreen((byte) value, loc.getPixel());
+        break;
+      case BLUE:
+        loc.getStrip().setPixelBlue((byte) value, loc.getPixel());
+        break;
+      default:
+        break;
       }
 
     } catch (NullPointerException e) {
-  //      System.out.println("No pixel at universe " + universe + " channel "
-  //          + channel);
+      // System.out.println("No pixel at universe " + universe +
+      // " channel "
+      // + channel);
     }
   }
 
@@ -55,6 +56,10 @@ public class ArtNetReceiver extends Thread {
     // If we get here, it looks like there's a packet to handle.
     if (buf[8] == 0x00 && buf[9] == 0x50) {
       // Opcode 0x5000 is DMX data
+      if (!this.seenPacket) {
+        System.out.println("Got an artnet packet!");
+        this.seenPacket = true;
+      }
       int universe = (buf[14] | (buf[15] << 8)) + 1;
       for (int i = 0; i < 512; i++) {
         // the channel data is in buf[i+17];
@@ -73,8 +78,8 @@ public class ArtNetReceiver extends Thread {
     try {
       socket = new DatagramSocket(ARTNET_PORT, InetAddress.getByName("0.0.0.0"));
       socket.setBroadcast(true);
-      System.out.println("Listen on " + socket.getLocalAddress() + " from "
-          + socket.getInetAddress() + " port " + socket.getBroadcast());
+      System.out.println("Listening on " + socket.getLocalAddress() + " port "
+          + socket.getLocalPort() + ", broadcast=" + socket.getBroadcast());
     } catch (IOException e) {
       e.printStackTrace();
       return;
@@ -85,9 +90,7 @@ public class ArtNetReceiver extends Thread {
         socket.receive(packet);
         parseArtnetPacket(packet);
         if (packetno % 100 == 0)
-//          System.out.println("Got a packet");
-        // System.out.println(Arrays.toString(packet.getData()));
-        packetno++;
+          packetno++;
       } catch (IOException e) {
         e.printStackTrace();
       }
