@@ -218,6 +218,7 @@ public class ArtNetReceiver extends Thread {
     DatagramPacket packet = new DatagramPacket(buf, buf.length);
     try {
       socket = new DatagramSocket(ARTNET_PORT, InetAddress.getByName("0.0.0.0"));
+      socket.setReuseAddress(true);
       socket.setBroadcast(true);
       System.out.println("Listening on " + socket.getLocalAddress() + " port "
           + socket.getLocalPort() + ", broadcast=" + socket.getBroadcast());
