@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.InterfaceAddress;
 import java.util.Enumeration;
@@ -217,10 +218,13 @@ public class ArtNetReceiver extends Thread {
     DatagramSocket socket = null;
     DatagramPacket packet = new DatagramPacket(buf, buf.length);
     try {
-      socket = new DatagramSocket(ARTNET_PORT, InetAddress.getByName("0.0.0.0"));
+      socket = new DatagramSocket(null);
+      
       socket.setReuseAddress(true);
       socket.setBroadcast(true);
-      System.out.println("Listening on " + socket.getLocalAddress() + " port "
+      
+      socket.bind(new InetSocketAddress(InetAddress.getByName("0.0.0.0"), ARTNET_PORT));
+      System.out.println("Listening for Art-Net messages on " + socket.getLocalAddress() + " port "
           + socket.getLocalPort() + ", broadcast=" + socket.getBroadcast());
     } catch (IOException e) {
       e.printStackTrace();
