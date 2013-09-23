@@ -131,6 +131,12 @@ public class ArtNetReceiver extends Thread {
       case BLUE:
         loc.getStrip().setPixelBlue((byte) value, loc.getPixel());
         break;
+      case ORANGE:
+        loc.getStrip().setPixelOrange((byte) value, loc.getPixel());
+        break;
+      case WHITE:
+        loc.getStrip().setPixelWhite((byte) value, loc.getPixel());
+        break;
       default:
         break;
       }

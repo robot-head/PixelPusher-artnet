@@ -43,20 +43,43 @@ public class ArtNetMapping {
 
       while (totalPixelsLeftToMap > 0) {
         // set current pixel's mapping
-        System.out.println("ArtNet: [" + currentUniverse + ", "
-            + currentChannel + "," + (currentChannel + 1) + ","
-            + (currentChannel + 2) + "] -> PixelPusher: [" + currentStrip
-            + ", " + currentPixel + "]");
-        mapping.put(new ArtNetLocation(currentUniverse, currentChannel),
-            new PixelPusherLocation(pusher.getStrip(currentStrip),
-                currentPixel, PixelPusherLocation.Channel.RED));
-        mapping.put(new ArtNetLocation(currentUniverse, currentChannel + 1),
-            new PixelPusherLocation(pusher.getStrip(currentStrip),
-                currentPixel, PixelPusherLocation.Channel.GREEN));
-        mapping.put(new ArtNetLocation(currentUniverse, currentChannel + 2),
-            new PixelPusherLocation(pusher.getStrip(currentStrip),
-                currentPixel, PixelPusherLocation.Channel.BLUE));
-
+    	if (pusher.getStrip(currentStrip).getRGBOW()) {
+       		System.out.println("ArtNet: RGBOW channels [" + currentUniverse + ", "
+    				+ currentChannel + "," + (currentChannel + 1) + ","
+    				+ (currentChannel + 2) + ","+ (currentChannel + 3) +","
+    				+ (currentChannel + 4) + "] -> PixelPusher: [" + currentStrip
+    				+ ", " + currentPixel + "]");
+    		mapping.put(new ArtNetLocation(currentUniverse, currentChannel),
+    				new PixelPusherLocation(pusher.getStrip(currentStrip),
+    				currentPixel, PixelPusherLocation.Channel.RED));
+    		mapping.put(new ArtNetLocation(currentUniverse, currentChannel + 1),
+    				new PixelPusherLocation(pusher.getStrip(currentStrip),
+    				currentPixel, PixelPusherLocation.Channel.GREEN));
+    		mapping.put(new ArtNetLocation(currentUniverse, currentChannel + 2),
+    				new PixelPusherLocation(pusher.getStrip(currentStrip),
+    			    currentPixel, PixelPusherLocation.Channel.BLUE));
+    		mapping.put(new ArtNetLocation(currentUniverse, currentChannel + 3),
+    				new PixelPusherLocation(pusher.getStrip(currentStrip),
+    			    currentPixel, PixelPusherLocation.Channel.ORANGE));
+    		mapping.put(new ArtNetLocation(currentUniverse, currentChannel + 4),
+    				new PixelPusherLocation(pusher.getStrip(currentStrip),
+    			    currentPixel, PixelPusherLocation.Channel.WHITE));
+   		
+    	} else {
+    		System.out.println("ArtNet: RGB channels [" + currentUniverse + ", "
+    				+ currentChannel + "," + (currentChannel + 1) + ","
+    				+ (currentChannel + 2) + "] -> PixelPusher: [" + currentStrip
+    				+ ", " + currentPixel + "]");
+    		mapping.put(new ArtNetLocation(currentUniverse, currentChannel),
+    				new PixelPusherLocation(pusher.getStrip(currentStrip),
+    				currentPixel, PixelPusherLocation.Channel.RED));
+    		mapping.put(new ArtNetLocation(currentUniverse, currentChannel + 1),
+    				new PixelPusherLocation(pusher.getStrip(currentStrip),
+    				currentPixel, PixelPusherLocation.Channel.GREEN));
+    		mapping.put(new ArtNetLocation(currentUniverse, currentChannel + 2),
+    				new PixelPusherLocation(pusher.getStrip(currentStrip),
+    			    currentPixel, PixelPusherLocation.Channel.BLUE));
+    	}
         // increment pixelpusher pixel index
         currentPixel++;
         totalPixelsLeftToMap--;
@@ -75,10 +98,18 @@ public class ArtNetMapping {
         }
 
         // increment artnet channel by three
-        currentChannel += 3;
-        if (CHANNELS_PER_UNIVERSE - currentChannel < 3) {
-          currentChannel = 1;
-          currentUniverse++;
+        if (pusher.getStrip(currentStrip).getRGBOW()) {
+        	currentChannel += 5;
+            if (CHANNELS_PER_UNIVERSE - currentChannel < 5) {
+                currentChannel = 1;
+                currentUniverse++;
+              }
+        } else {
+        	currentChannel += 3;
+            if (CHANNELS_PER_UNIVERSE - currentChannel < 3) {
+                currentChannel = 1;
+                currentUniverse++;
+            }
         }
       }
     }
