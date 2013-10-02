@@ -10,10 +10,10 @@ class PixelPusherObserver implements Observer {
   public ArtNetMapping mapping = new ArtNetMapping();
 
   public void update(Observable registry, Object updatedDevice) {
-    // logging.info("Registry changed!");
+     //logging.info("Registry changed!");
     if (updatedDevice != null) {
       generateMapping((DeviceRegistry) registry);
-      // println("Device change: " + updatedDevice);
+       System.out.println("Device change: " + updatedDevice);
     }
     this.hasStrips = true;
   }

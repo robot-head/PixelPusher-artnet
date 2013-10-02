@@ -31,8 +31,10 @@ public class ArtNetMapping {
       int startingUniverse = pusher.getArtnetUniverse();
       System.out.println("Mapping pusher at starting universe "
           + startingUniverse + ", starting channel: " + startingChannel);
-      if (startingChannel == 0 && startingUniverse == 0)
-        continue;
+      if (startingChannel == 0 && startingUniverse == 0) {
+    	  System.out.println("Not mapping.  Set artnet_channel and artnet_universe to something other than 0.");
+          continue;
+      }
       int numberOfStrips = pusher.getNumberOfStrips();
       int pixelsPerStrip = pusher.getPixelsPerStrip();
       int currentUniverse = startingUniverse;
@@ -90,6 +92,9 @@ public class ArtNetMapping {
           currentPixel = 0;
           currentStrip++;
 
+          if (currentStrip >= pusher.getNumberOfStrips())
+        	  continue;
+          
           if (!pack) {
             currentChannel = 1;
             currentUniverse++;
