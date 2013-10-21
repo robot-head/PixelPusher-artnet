@@ -55,7 +55,7 @@ public class SacnReceiver extends Thread {
 	
 	 public SacnReceiver(PixelPusherObserver observer) {
 		    this.observer = observer;
-		    buf = new byte[576];
+		    buf = new byte[680];
 		    this.seenPacket = false;
 	 }
 	
