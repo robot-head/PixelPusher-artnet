@@ -1,10 +1,15 @@
 package com.heroicrobot.pixelpusher.artnet;
 
+// 239.255.0.1
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.MulticastSocket;
+import java.net.NetworkInterface;
+import java.util.Enumeration;
 
 public class SacnReceiver extends Thread {
 
@@ -16,6 +21,7 @@ public class SacnReceiver extends Thread {
 	public static final byte[] ACN_IDENTIFIER =  {0x41, 0x53, 0x43, 0x2d, 0x45, 0x31, 0x2e, 0x31, 0x37, 0x00, 0x00, 0x00 };
 	//The well-known streaming ACN port (currently the ACN port)
 	public static final int SACN_PORT = 5568;
+	public MulticastSocket mcSocket;
 	boolean seenPacket = false;
 	private byte[] buf;
 
@@ -57,9 +63,25 @@ public class SacnReceiver extends Thread {
 		    this.observer = observer;
 		    buf = new byte[680];
 		    this.seenPacket = false;
+		    try {
+				mcSocket = new MulticastSocket(SACN_PORT);
+			//	mcSocket.setReuseAddress(true);
+				//mcSocket.bind(new InetSocketAddress(InetAddress.getByName("0.0.0.0"), SACN_PORT));
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		    
 	 }
 	
-	
+	 public void addGroup(InetAddress group) {
+		 try {
+			System.out.println("Joining multicast group "+group);
+			mcSocket.joinGroup(group);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	 }
+	 
 	 private void update_channel(int universe, int channel, int value) {
 		    try {
 		      PixelPusherLocation loc = observer.mapping.getPixelPusherLocation(
@@ -117,31 +139,34 @@ public class SacnReceiver extends Thread {
 	
 	  @Override
 	  public void run() {
-	    DatagramSocket socket = null;
+	  //  DatagramSocket socket = null;
 	    DatagramPacket packet = new DatagramPacket(buf, buf.length);
-	    try {
-	      socket = new DatagramSocket(null);
+
+	  //  try {
+	      // socket = new DatagramSocket(null);
 	      
-	      socket.setReuseAddress(true);
-	      socket.setBroadcast(true);
+	     // socket.setReuseAddress(true);
+	     // socket.setBroadcast(true);
 	      
-	      socket.bind(new InetSocketAddress(InetAddress.getByName("0.0.0.0"), SACN_PORT));
-	      System.out.println("Listening for streaming ACN messages on " + socket.getLocalAddress() + " port "
-	          + socket.getLocalPort() + ", broadcast=" + socket.getBroadcast());
-	    } catch (IOException e) {
-	      e.printStackTrace();
-	      return;
-	    }
+	     // socket.bind(new InetSocketAddress(InetAddress.getByName("0.0.0.0"), SACN_PORT));
+	     // System.out.println("Listening for streaming ACN messages on " + socket.getLocalAddress() + " port "
+	     //     + socket.getLocalPort() + ", broadcast=" + socket.getBroadcast());
+	  //  } catch (IOException e) {
+	   //   e.printStackTrace();
+	   //   return;
+	   // }
 	    int packetno = 0;
 	    while (true) {
 	      try {
-	        socket.receive(packet);
+	    	packet.setLength(buf.length);
+	        mcSocket.receive(packet);
 	        parseSacnPacket(packet);
 	        if (packetno % 100 == 0)
 	          packetno++;
 	      } catch (IOException e) {
 	        e.printStackTrace();
 	      }
+	      
 	    }
 	  }
 }

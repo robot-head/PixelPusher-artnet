@@ -1,9 +1,12 @@
 package com.heroicrobot.pixelpusher.artnet;
 
+import java.net.InetAddress;
+
 public class ArtNetLocation {
 
   private int universe;
   private int channel;
+  private InetAddress multicast;
 
   /*
    * (non-Javadoc)
@@ -70,9 +73,18 @@ public class ArtNetLocation {
     this.channel = channel;
   }
 
-  public ArtNetLocation(int universe, int channel) {
+  public ArtNetLocation(int universe, int channel, InetAddress location) {
     this.universe = universe;
     this.channel = channel;
+    this.multicast = location;
   }
+
+public InetAddress getMulticast() {
+	return multicast;
+}
+
+public void setMulticast(InetAddress multicast) {
+	this.multicast = multicast;
+}
 
 }

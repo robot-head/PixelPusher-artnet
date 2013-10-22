@@ -1,5 +1,7 @@
 package com.heroicrobot.pixelpusher.artnet;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Observable;
 
@@ -51,5 +53,8 @@ class PixelPusherObserver implements Observer {
 
   private void generateMapping(DeviceRegistry registry) {
     mapping.GenerateMapping(registry.getPushers(), true);
+    for (InetAddress address: mapping.multicastAddresses) {
+    	ArtNetBridge.sacnReceiver.addGroup(address);
+    }
   }
 }

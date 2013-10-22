@@ -7,7 +7,8 @@ public class ArtNetBridge {
   private static PixelPusherObserver observer;
   static DeviceRegistry registry;
   boolean hasStrips;
-
+  static ArtNetReceiver artnetReceiver;
+  static SacnReceiver sacnReceiver;
   /**
    * @param args
    */
@@ -15,8 +16,8 @@ public class ArtNetBridge {
     observer = new PixelPusherObserver();
     registry = new DeviceRegistry();
     registry.addObserver(observer);
-    ArtNetReceiver artnetReceiver = new ArtNetReceiver(observer);
-    SacnReceiver sacnReceiver = new SacnReceiver(observer);
+    artnetReceiver = new ArtNetReceiver(observer);
+    sacnReceiver = new SacnReceiver(observer);
     
     artnetReceiver.start();
     sacnReceiver.start();

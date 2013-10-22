@@ -1,5 +1,8 @@
 package com.heroicrobot.pixelpusher.artnet;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,13 +14,15 @@ public class ArtNetMapping {
   public static final int CHANNELS_PER_UNIVERSE = 512;
 
   Map<ArtNetLocation, PixelPusherLocation> mapping;
+  List<InetAddress> multicastAddresses;
 
   ArtNetMapping() {
     mapping = new HashMap<ArtNetLocation, PixelPusherLocation>();
+    multicastAddresses = new ArrayList<InetAddress>();
   }
 
   public PixelPusherLocation getPixelPusherLocation(int universe, int channel) {
-    ArtNetLocation loc = new ArtNetLocation(universe, channel);
+    ArtNetLocation loc = new ArtNetLocation(universe, channel, getSacnMulticast(universe));
     return this.mapping.get(loc);
   }
 
@@ -25,6 +30,21 @@ public class ArtNetMapping {
     GenerateMapping(pushers, false);
   }
 
+  public InetAddress getSacnMulticast(int universe) {
+	  byte[] rawAddr = new byte[4];
+	  rawAddr[0] = (byte)239;
+	  rawAddr[1] = (byte)255;
+	  rawAddr[2] = (byte)((universe >> 8) & 0xff);
+	  rawAddr[3] = (byte)(universe & 0xff);
+	  
+	  try {
+		return InetAddress.getByAddress(rawAddr);
+	  } catch (UnknownHostException e) {
+		e.printStackTrace();
+		return null;
+	}
+  }
+  
   public void GenerateMapping(List<PixelPusher> pushers, boolean pack) {
     for (PixelPusher pusher : pushers) {
       int startingChannel = pusher.getArtnetChannel();
@@ -42,45 +62,51 @@ public class ArtNetMapping {
       int currentStrip = 0;
       int currentPixel = 0;
       int totalPixelsLeftToMap = numberOfStrips * pixelsPerStrip;
+      InetAddress location;
 
       while (totalPixelsLeftToMap > 0) {
         // set current pixel's mapping
+    	location = getSacnMulticast(currentUniverse);
     	if (pusher.getStrip(currentStrip).getRGBOW()) {
        		System.out.println("ArtNet: RGBOW channels [" + currentUniverse + ", "
     				+ currentChannel + "," + (currentChannel + 1) + ","
     				+ (currentChannel + 2) + ","+ (currentChannel + 3) +","
     				+ (currentChannel + 4) + "] -> PixelPusher: [" + currentStrip
-    				+ ", " + currentPixel + "]");
-    		mapping.put(new ArtNetLocation(currentUniverse, currentChannel),
+    				+ ", " + currentPixel + "] at multicast "+location);
+    		mapping.put(new ArtNetLocation(currentUniverse, currentChannel, location),
     				new PixelPusherLocation(pusher.getStrip(currentStrip),
     				currentPixel, PixelPusherLocation.Channel.RED));
-    		mapping.put(new ArtNetLocation(currentUniverse, currentChannel + 1),
+    		mapping.put(new ArtNetLocation(currentUniverse, currentChannel + 1, location),
     				new PixelPusherLocation(pusher.getStrip(currentStrip),
     				currentPixel, PixelPusherLocation.Channel.GREEN));
-    		mapping.put(new ArtNetLocation(currentUniverse, currentChannel + 2),
+    		mapping.put(new ArtNetLocation(currentUniverse, currentChannel + 2,  location),
     				new PixelPusherLocation(pusher.getStrip(currentStrip),
     			    currentPixel, PixelPusherLocation.Channel.BLUE));
-    		mapping.put(new ArtNetLocation(currentUniverse, currentChannel + 3),
+    		mapping.put(new ArtNetLocation(currentUniverse, currentChannel + 3, location),
     				new PixelPusherLocation(pusher.getStrip(currentStrip),
     			    currentPixel, PixelPusherLocation.Channel.ORANGE));
-    		mapping.put(new ArtNetLocation(currentUniverse, currentChannel + 4),
+    		mapping.put(new ArtNetLocation(currentUniverse, currentChannel + 4, location),
     				new PixelPusherLocation(pusher.getStrip(currentStrip),
     			    currentPixel, PixelPusherLocation.Channel.WHITE));
+    		if (!multicastAddresses.contains(location))
+    			multicastAddresses.add(location);
    		
     	} else {
     		System.out.println("ArtNet: RGB channels [" + currentUniverse + ", "
     				+ currentChannel + "," + (currentChannel + 1) + ","
     				+ (currentChannel + 2) + "] -> PixelPusher: [" + currentStrip
-    				+ ", " + currentPixel + "]");
-    		mapping.put(new ArtNetLocation(currentUniverse, currentChannel),
+    				+ ", " + currentPixel + "] at multicast "+location);
+    		mapping.put(new ArtNetLocation(currentUniverse, currentChannel, location),
     				new PixelPusherLocation(pusher.getStrip(currentStrip),
     				currentPixel, PixelPusherLocation.Channel.RED));
-    		mapping.put(new ArtNetLocation(currentUniverse, currentChannel + 1),
+    		mapping.put(new ArtNetLocation(currentUniverse, currentChannel + 1, location),
     				new PixelPusherLocation(pusher.getStrip(currentStrip),
     				currentPixel, PixelPusherLocation.Channel.GREEN));
-    		mapping.put(new ArtNetLocation(currentUniverse, currentChannel + 2),
+    		mapping.put(new ArtNetLocation(currentUniverse, currentChannel + 2, location),
     				new PixelPusherLocation(pusher.getStrip(currentStrip),
     			    currentPixel, PixelPusherLocation.Channel.BLUE));
+    		if (!multicastAddresses.contains(location))
+    			multicastAddresses.add(location);
     	}
         // increment pixelpusher pixel index
         currentPixel++;
