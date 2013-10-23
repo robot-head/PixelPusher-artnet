@@ -1,7 +1,6 @@
 package com.heroicrobot.pixelpusher.artnet;
 
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Observable;
 
