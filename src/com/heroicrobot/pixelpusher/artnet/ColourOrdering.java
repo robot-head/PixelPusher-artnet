@@ -27,7 +27,7 @@ public class ColourOrdering {
 		if (orderString.equalsIgnoreCase("GRB"))
 			this.order = GRB;
 		if (orderString.equalsIgnoreCase("GBR"))
-			this.order = GRB;
+			this.order = GBR;
 		if (orderString.equalsIgnoreCase("BRG"))
 			this.order = BRG;
 		if (orderString.equalsIgnoreCase("BGR"))

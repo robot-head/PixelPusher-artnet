@@ -129,7 +129,7 @@ public class SacnReceiver extends Thread {
 		      //System.out.println("Universe = "+universe);
 		      for (int i = 0; i < 512; i++) {
 		        // the channel data is in buf[i+124];
-		        update_channel(universe, i + 1, buf[i + 127]);
+		        update_channel(universe, i + 1, buf[i + 126]);
 		      }
 		     
 		  }
