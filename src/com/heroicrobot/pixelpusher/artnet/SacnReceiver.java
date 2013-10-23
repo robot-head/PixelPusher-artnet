@@ -23,6 +23,8 @@ public class SacnReceiver extends Thread {
 	private PixelPusherObserver observer;
 	
 	/*
+	 * Don't reformat this or I will cut you.  - jls
+	 * 
 	 * 
 		struct sacn_node_s {
 		  
