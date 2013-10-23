@@ -70,7 +70,7 @@ public class SacnReceiver extends Thread {
 	
 	 public void addGroup(InetAddress group) {
 		 try {
-			System.out.println("Joining multicast group "+group);
+			System.out.println("sACN: Joining multicast group "+group);
 			mcSocket.joinGroup(group);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -114,7 +114,7 @@ public class SacnReceiver extends Thread {
 		    if (buf.length > ACN_IDENTIFIER_SIZE) {
 		    for (int i = 0; i < ACN_IDENTIFIER_SIZE; i++) {
 		    		if (ACN_IDENTIFIER[i] != buf[i + 4]) { // packetId
-		    	  		System.out.println("Got a packet on the sACN port, but ID was wrong.");
+		    	  		System.out.println("sACN:  Got a packet on the sACN port, but ID was wrong.");
 		    	  		return;
 		      		}
 		    	}
@@ -122,7 +122,7 @@ public class SacnReceiver extends Thread {
 		    // If we get here, it looks like there's a packet to handle.
 		    
 		      if (!this.seenPacket) {
-		        System.out.println("Got an sACN packet!");
+		        System.out.println("sACN:  Got an sACN packet!");
 		        this.seenPacket = true;
 		      }
 		      int universe = (buf[114] | (buf[113] << 8));
