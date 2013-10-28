@@ -178,6 +178,7 @@ public class ArtNetReceiver extends Thread {
     		    	  ds.setBroadcast(true);
     		    	  DatagramPacket dp = new DatagramPacket(artpoll_buf, artpoll_buf.length, broadcast, 0x1936);
     		    	  ds.send(dp);
+    		    	  ds.close();
     		      } catch (Exception e) {
     		    	  System.err.println("Failed to send ArtPollReply");
     		    	  e.printStackTrace();
@@ -219,7 +220,10 @@ public class ArtNetReceiver extends Thread {
     }
   }
 
-  @Override
+  
+// Suppress the warning about never closing our daemon socket.
+@SuppressWarnings("resource")
+@Override
   public void run() {
     DatagramSocket socket = null;
     DatagramPacket packet = new DatagramPacket(buf, buf.length);
