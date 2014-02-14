@@ -207,14 +207,19 @@ public class ArtNetReceiver extends Thread {
         this.seenPacket = true;
       }
       int universe = (buf[14] | (buf[15] << 8)) + 1;
-      for (int i = 0; i < 512; i++) {
-        // the channel data is in buf[i+17];
+      int length = (buf[16] | buf[17] <<8);
+      for (int i = 0; i < length; i++) {
+        // the channel data is in buf[i+18];
         update_channel(universe, i + 1, buf[i + 18]);
       }
 
     } else {
       if (buf[8] == 0x00 && buf[9] == 0x20) {
     	  sendArtPollReply(buf);
+      }
+      if (buf[8] == 0x00 && buf[9] == 0x51) {
+    	  // Opcode 0x5100 is Non-Zero Start DMX data.
+    	  System.err.println("Non-zero start data received, but is not supported.");
       }
       return;
     }
