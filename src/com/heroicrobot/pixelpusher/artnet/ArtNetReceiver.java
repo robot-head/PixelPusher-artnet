@@ -207,7 +207,21 @@ public class ArtNetReceiver extends Thread {
         this.seenPacket = true;
       }
       int universe = (buf[14] | (buf[15] << 8)) + 1;
-      int length = (buf[16] | buf[17] <<8);
+      int length = (buf[17] | buf[16] <<8);
+      int length_bytes = 18+length;
+      if (length < 2) {
+    	  System.err.println("Received short Art-Net packet.");
+    	  return;
+      }
+      if (length > 512) {
+    	  System.err.println("Received excessively long Art-Net packet.");
+    	  return;
+      }
+      if (packet.getLength() < length_bytes) {
+    	  System.err.println("Expected Art-Net datagram length "+length_bytes+
+    			  " but received "+packet.getLength()+", which is too short.");
+    	  return;
+      }
       for (int i = 0; i < length; i++) {
         // the channel data is in buf[i+18];
         update_channel(universe, i + 1, buf[i + 18]);
