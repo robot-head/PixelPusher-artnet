@@ -51,7 +51,7 @@ class PixelPusherObserver implements Observer {
   }
 
   private void generateMapping(DeviceRegistry registry) {
-    mapping.GenerateMapping(registry.getPushers(), true);
+    mapping.GenerateMapping(registry.getPushers(), ArtNetBridge.packing);
     for (InetAddress address: mapping.multicastAddresses) {
     	ArtNetBridge.sacnReceiver.addGroup(address);
     }

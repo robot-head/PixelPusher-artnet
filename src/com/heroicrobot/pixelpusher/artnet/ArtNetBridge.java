@@ -4,7 +4,8 @@ import com.heroicrobot.dropbit.registry.DeviceRegistry;
 
 public class ArtNetBridge {
 
-  public static ColourOrdering order;	
+  public static ColourOrdering order;
+  public static boolean packing=true;
 	
   private static PixelPusherObserver observer;
   static DeviceRegistry registry;
@@ -24,9 +25,21 @@ public class ArtNetBridge {
 		order = new ColourOrdering(ColourOrdering.RGB);
 	}
 	
+	if (args.length > 1) {
+		if (args[1].toLowerCase().startsWith("nopack")) {
+			packing = false;
+		}
+	}
+	
 	System.out.println("Red components at channel + "+ order.getOffset(ColourOrdering.RED));
 	System.out.println("Green components at channel + "+ order.getOffset(ColourOrdering.GREEN));
 	System.out.println("Blue components at channel + "+ order.getOffset(ColourOrdering.BLUE));
+	
+	if (packing) {
+		System.out.println("Universe packing mode pack: universes will be filled");
+	} else {
+		System.out.println("Universe packing mode nopack: universes will be left part-filled");
+	}
 	  
     observer = new PixelPusherObserver();
     registry = new DeviceRegistry();
