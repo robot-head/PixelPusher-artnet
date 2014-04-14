@@ -81,7 +81,6 @@ public class SacnReceiver extends Thread {
 		    try {
 		      PixelPusherLocation loc = observer.mapping.getPixelPusherLocation(
 		          universe, channel);
-		      // TODO: Extract color component from value
 		      switch (loc.getChannel()) {
 		      case RED:
 		        loc.getStrip().setPixelRed((byte) value, loc.getPixel());
@@ -128,7 +127,7 @@ public class SacnReceiver extends Thread {
 		      int universe = (buf[114] | (buf[113] << 8));
 		      //System.out.println("Universe = "+universe);
 		      for (int i = 0; i < 512; i++) {
-		        // the channel data is in buf[i+124];
+		        // the channel data is in buf[i+126];
 		        update_channel(universe, i + 1, buf[i + 126]);
 		      }
 		     
