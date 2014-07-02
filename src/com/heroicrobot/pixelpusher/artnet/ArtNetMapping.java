@@ -16,12 +16,18 @@ public class ArtNetMapping {
 
   Map<ArtNetLocation, PixelPusherLocation> mapping;
   List<InetAddress> multicastAddresses;
+  List<PixelPusher> mappedPushers;
 
   ArtNetMapping() {
     mapping = new HashMap<ArtNetLocation, PixelPusherLocation>();
     multicastAddresses = new ArrayList<InetAddress>();
+    mappedPushers = new ArrayList<PixelPusher>();
   }
 
+  public List<PixelPusher> getMappedPushers() {
+	 return mappedPushers;
+  }
+  
   public PixelPusherLocation getPixelPusherLocation(int universe, int channel) {
     ArtNetLocation loc = new ArtNetLocation(universe, channel, getSacnMulticast(universe));
     return this.mapping.get(loc);
@@ -56,6 +62,12 @@ public class ArtNetMapping {
     	  System.out.println("Not mapping.  Set artnet_channel and artnet_universe to something other than 0.");
           continue;
       }
+      if (mappedPushers.contains(pusher)) {
+    	  System.out.println("Already mapped this pusher.");
+      } else {
+    	  mappedPushers.add(pusher);
+      }
+      
       int numberOfStrips = pusher.getNumberOfStrips();
       int pixelsPerStrip = pusher.getPixelsPerStrip();
       int currentUniverse = startingUniverse;
@@ -89,6 +101,7 @@ public class ArtNetMapping {
     		mapping.put(new ArtNetLocation(currentUniverse, currentChannel + 4, location),
     				new PixelPusherLocation(pusher.getStrip(currentStrip),
     			    currentPixel, PixelPusherLocation.Channel.WHITE));
+    		pusher.setLastUniverse(currentUniverse);
     		if (!multicastAddresses.contains(location))
     			multicastAddresses.add(location);
    		
@@ -106,6 +119,7 @@ public class ArtNetMapping {
     		mapping.put(new ArtNetLocation(currentUniverse, currentChannel +ArtNetBridge.order.getOffset(ColourOrdering.BLUE), location),
     				new PixelPusherLocation(pusher.getStrip(currentStrip),
     			    currentPixel, PixelPusherLocation.Channel.BLUE));
+    		pusher.setLastUniverse(currentUniverse);
     		if (!multicastAddresses.contains(location))
     			multicastAddresses.add(location);
     	}

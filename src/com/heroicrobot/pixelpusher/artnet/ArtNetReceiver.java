@@ -1,6 +1,9 @@
 package com.heroicrobot.pixelpusher.artnet;
 
 import java.io.IOException;
+
+import com.heroicrobot.dropbit.devices.pixelpusher.PixelPusher;
+
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -18,8 +21,6 @@ public class ArtNetReceiver extends Thread {
   public static final byte[] short_name = {0x50, 0x69, 0x78, 0x65, 0x6c, 0x50, 0x75, 
 	  0x73, 0x68, 0x65, 0x72, 0x20, 0x31, 0x2e, 0x31, 0x00 };
   
-  
-  
   public static byte[] artpoll_buf;
 
   byte[] buf;
@@ -31,7 +32,7 @@ public class ArtNetReceiver extends Thread {
     buf = new byte[576];
     this.seenPacket = false;
     artpoll_buf = new byte[8 + 2 + 6 + 1 + 1 + 1 + 1 + 2 + 1 + 1 + 2 + 18 + 64 + 64 +
-                           1 + 1+ 4 + 4 + 4 + 4 + 4 + 1 + 1 + 1 + 3 + 1 + 6 + 32];
+                           1 + 1+ 4 + 4 + 4 + 4 + 4 + 1 + 1 + 1 + 3 + 1 + 6 + 32 + 64];
     
     initArtPollBuf();
   }
@@ -83,6 +84,7 @@ public class ArtNetReceiver extends Thread {
 		  e.printStackTrace();
 		  return;
 	  }
+	  
 	  artpoll_buf[i++] = 0x36; // port 0x1936 == 6454
 	  artpoll_buf[i++] = 0x19;
 	  artpoll_buf[i++] = 0;	  // VersionH
@@ -99,10 +101,11 @@ public class ArtNetReceiver extends Thread {
 		  artpoll_buf[i++] = short_name[j];   // ShortName
 	  artpoll_buf[i++] = 0;
 	  artpoll_buf[i++] = 0;  	  // pad to 18
-	  for (int j=0; j<16; j++)
+	  
+	  for (int j=0; j<15; j++)		// skip the terminator
 		  artpoll_buf[i++] = short_name[j];   // LongName
-	  for (int j=0; j<48; j++)
-		  artpoll_buf[i++] = 0;  	  // pad to 48
+	  for (int j=0; j<49; j++)
+		  artpoll_buf[i++] = 0;  	  // pad to 48, acts as terminator
 	  
 	  	  artpoll_buf[i++] = 0x4f;	  // NodeReport
 	  	  artpoll_buf[i++] = 0x4b;    // = "OK"
@@ -110,9 +113,127 @@ public class ArtNetReceiver extends Thread {
 		  artpoll_buf[i++] = 0;   // pad to 64
 	  
 	  artpoll_buf[i++] = 0;		// NumPortsH
-	  artpoll_buf[i++] = 0;		// NumPorts
+	  artpoll_buf[i++] = 0;		// NumPortsL
 	  for (int j=0; j<4; j++)
 		  artpoll_buf[i++] = -1;	// PortType
+	  
+  }
+  
+  /*
+   * Art-Net has some really weird representations in its ArtPollReply packet.  The 15-bit
+   * port number is represented thus:
+   * 
+   * 
+   *                    port number bits
+   *  14  13  12  11  10   9   8   7   6   5   4   3   2   1   0    Mask   Field shift
+   *  																
+   *   1   1   1   1   1   1   1   0   0   0   0   0   0   0   0   = 0x7f00 	>> 8
+   *  NS6 NS5 NS4 NS3 NS2 NS1 NS0
+   *  
+   *   0   0   0   0   0   0   0   1   1   1   1   0   0   0   0   = 0x00f0 	>> 4
+   *                              SS3 SS2 SS1 SS0
+   *                              
+   *                              	               1   1   1   1   = 0x000f		>> 0
+   *                                              SO3 SO2 SO1 SO0 
+   *                                              
+   *  Spread across NetSwitch, SubSwitch and SwOut fields. - jls                                             
+   * 
+   *
+   */
+  
+  
+  private void updateArtPollBuf(PixelPusher pusher) {
+	  int i=0;
+	  
+	  int artnetUniverse = pusher.getArtnetUniverse();
+	  int artNetPorts = pusher.getLastUniverse() - artnetUniverse;
+	  
+	  for (i=0; i<8; i++)
+		  artpoll_buf[i] = header[i];
+	  artpoll_buf[i++] = 0x00;
+	  artpoll_buf[i++] = 0x21;  // ArtPollReply = 0x2100
+	  
+	  try {
+		  InetAddress localhost = InetAddress.getLocalHost();
+		  byte[] localhost_bytes = localhost.getAddress();
+		  for (int j = 0; j<4; j++)
+			  artpoll_buf[i++] = localhost_bytes[j];
+	  } catch (Exception e) {
+		  e.printStackTrace();
+		  return;
+	  }
+	  artpoll_buf[i++] = 0x36; // port 0x1936 == 6454
+	  artpoll_buf[i++] = 0x19;
+	  artpoll_buf[i++] = 0;	  // VersionH
+	  artpoll_buf[i++] = 14;  // Version
+	  artpoll_buf[i++] = (byte) ((artnetUniverse & 0x7f00) >> 8);   // NetSwitch
+	  artpoll_buf[i++] = (byte) ((artnetUniverse & 0x00f0) >> 4);   // SubSwitch
+	  artpoll_buf[i++] = 0;   // OEM
+	  artpoll_buf[i++] = 0;
+	  artpoll_buf[i++] = 0;   // UbeaVersion
+	  artpoll_buf[i++] = 0;   // status
+	  artpoll_buf[i++] = 0;   // EstaMan
+	  artpoll_buf[i++] = 0;
+	  for (int j=0; j<16; j++)
+		  artpoll_buf[i++] = short_name[j];   // ShortName
+	  artpoll_buf[i++] = 0;
+	  artpoll_buf[i++] = 0;  	  // pad to 18
+	  for (int j=0; j<15; j++)				  // skip the terminator
+		  artpoll_buf[i++] = short_name[j];   // LongName
+	  
+	  byte[] macAddr = pusher.getMacAddress().getBytes();
+	  
+	  for (int j=0; j<49; j++) {			// append this pusher's mac address to LongName
+		  if (j<macAddr.length) {
+			  artpoll_buf[i++] = macAddr[j];
+		  } else {
+			  artpoll_buf[i++] = 0;  	  // pad to 48, acts as terminator
+		  }
+	  }
+	  	  artpoll_buf[i++] = 0x4f;	  // NodeReport
+	  	  artpoll_buf[i++] = 0x4b;    // = "OK"
+	  for (int j=0; j<62; j++)
+		  artpoll_buf[i++] = 0;   // pad to 64
+	  
+	  artpoll_buf[i++] = 0;		// NumPortsH (always zero)
+	  artpoll_buf[i++] = (byte) (artNetPorts & 0xff);		// NumPorts
+	  for (int j=0; j<4; j++)
+		  artpoll_buf[i++] = (byte) 0x80;	// PortType (Can output, DMX512).
+	  for (int j=0; j<4; j++)
+		  artpoll_buf[i++] = (byte) 0x80;   // GoodInput (Data received)
+	  for (int j=0; j<4; j++)
+		  artpoll_buf[i++] = (byte) 0x80;   // GoodOutput (Data is being transmitted)
+	  for (int j=0; j<4; j++)
+		  artpoll_buf[i++] = (byte) 0x0;    // SwIn (no input port)
+	  for (int j=0; j<4; j++)
+		  artpoll_buf[i++] = (byte) (artnetUniverse & 0x0f);   // SwOut (port address for the output ports)
+	  
+	  artpoll_buf[i++] = 1;					// SwVideo (showing ethernet data)
+	  artpoll_buf[i++] = 0;					// SwMacro (no macros)
+	  artpoll_buf[i++] = 0;					// SwRemote (no remote triggers)
+	  
+	  artpoll_buf[i++] = 0;					// Spare (not used, set to zero)
+	  artpoll_buf[i++] = 0;
+	  artpoll_buf[i++] = 0;
+	  artpoll_buf[i++] = 0;					// Style (StNode == DMX device)
+	  
+	  
+	  artpoll_buf[i++] = 0;					// MAC address high byte
+	  artpoll_buf[i++] = 0;					// We can't supply this, since some
+	  artpoll_buf[i++] = 0;					// Art-Net devices make assumptions about ARP.
+	  artpoll_buf[i++] = 0;
+	  artpoll_buf[i++] = 0;
+	  artpoll_buf[i++] = 0;
+	  
+	  artpoll_buf[i++] = 0;					// BindIp (mind your own damn business)
+	  artpoll_buf[i++] = 0;
+	  artpoll_buf[i++] = 0;
+	  artpoll_buf[i++] = 0; 
+	  
+	  artpoll_buf[i++] = 0; 				// BindIndex (zero if no binding)
+	  
+	  artpoll_buf[i++] = 14; 				// Status2 (1110b) - DHCP, 15 bit port addr
+	  
 	  
   }
 
@@ -229,7 +350,15 @@ public class ArtNetReceiver extends Thread {
 
     } else {
       if (buf[8] == 0x00 && buf[9] == 0x20) {
-    	  sendArtPollReply(buf);
+    	  if (observer.mapping.getMappedPushers().size() > 0) {
+    		  for (PixelPusher pusher: observer.mapping.getMappedPushers()) {
+    			  updateArtPollBuf(pusher);
+    			  sendArtPollReply(buf);
+    		  }
+    	  } else {
+    		  // We got nothing, just send the empty, single reply.
+    		  sendArtPollReply(buf);
+    	  }
       }
       if (buf[8] == 0x00 && buf[9] == 0x51) {
     	  // Opcode 0x5100 is Non-Zero Start DMX data.
