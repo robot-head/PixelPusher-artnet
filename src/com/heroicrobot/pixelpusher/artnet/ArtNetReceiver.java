@@ -370,7 +370,6 @@ public class ArtNetReceiver extends Thread {
 
   
 // Suppress the warning about never closing our daemon socket.
-@SuppressWarnings("resource")
 @Override
   public void run() {
     DatagramSocket socket = null;
