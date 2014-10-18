@@ -22,13 +22,15 @@ public class ArtNetReceiver extends Thread {
 	  0x73, 0x68, 0x65, 0x72, 0x20, 0x31, 0x2e, 0x31, 0x00 };
   
   public static byte[] artpoll_buf;
+  public static boolean debug;
 
   byte[] buf;
   PixelPusherObserver observer;
   boolean seenPacket;
 
-  public ArtNetReceiver(PixelPusherObserver observer) {
+  public ArtNetReceiver(PixelPusherObserver observer, boolean debug) {
     this.observer = observer;
+    ArtNetReceiver.debug = debug;
     buf = new byte[576];
     this.seenPacket = false;
     artpoll_buf = new byte[8 + 2 + 6 + 1 + 1 + 1 + 1 + 2 + 1 + 1 + 2 + 18 + 64 + 64 +
@@ -392,8 +394,10 @@ public class ArtNetReceiver extends Thread {
       try {
         socket.receive(packet);
         parseArtnetPacket(packet);
-        if (packetno % 100 == 0)
-          packetno++;
+        if (debug)
+        	if (packetno % 100 == 0)
+        		System.out.println("Received "+packetno+" Art-Net packets.");
+        packetno++;
       } catch (IOException e) {
         e.printStackTrace();
       }

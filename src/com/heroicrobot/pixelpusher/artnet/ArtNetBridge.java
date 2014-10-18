@@ -12,6 +12,7 @@ public class ArtNetBridge {
   boolean hasStrips;
   static ArtNetReceiver artnetReceiver;
   static SacnReceiver sacnReceiver;
+  static boolean debug=false;
   /**
    * @param args
    */
@@ -31,6 +32,12 @@ public class ArtNetBridge {
 		}
 	}
 	
+	if (args.length > 2) {
+		if (args[2].toLowerCase().startsWith("debug")) {
+			debug = true;
+		}
+	}
+	
 	System.out.println("Red components at channel + "+ order.getOffset(ColourOrdering.RED));
 	System.out.println("Green components at channel + "+ order.getOffset(ColourOrdering.GREEN));
 	System.out.println("Blue components at channel + "+ order.getOffset(ColourOrdering.BLUE));
@@ -40,11 +47,16 @@ public class ArtNetBridge {
 	} else {
 		System.out.println("Universe packing mode nopack: universes will be left part-filled");
 	}
+	if (debug) {
+		System.out.println("Debug mode: a message will be printed every 100 Art-Net packets.");
+	} else {
+		System.out.println("Debug mode disabled: no message will be printed for Art-Net packets.");
+	}
 	  
     observer = new PixelPusherObserver();
     registry = new DeviceRegistry();
     registry.addObserver(observer);
-    artnetReceiver = new ArtNetReceiver(observer);
+    artnetReceiver = new ArtNetReceiver(observer, debug);
     sacnReceiver = new SacnReceiver(observer);
     
     artnetReceiver.start();
