@@ -2,10 +2,10 @@ package com.heroicrobot.pixelpusher.artnet;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.heroicrobot.dropbit.devices.pixelpusher.PixelPusher;
 
@@ -20,8 +20,8 @@ public class ArtNetMapping {
 
   ArtNetMapping() {
     mapping = new HashMap<ArtNetLocation, PixelPusherLocation>();
-    multicastAddresses = new ArrayList<InetAddress>();
-    mappedPushers = new ArrayList<PixelPusher>();
+    multicastAddresses = new CopyOnWriteArrayList<InetAddress>();
+    mappedPushers = new CopyOnWriteArrayList<PixelPusher>();
   }
 
   public List<PixelPusher> getMappedPushers() {
