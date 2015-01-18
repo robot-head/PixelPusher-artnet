@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.heroicrobot.dropbit.devices.pixelpusher.PixelPusher;
+import com.heroicrobot.dropbit.registry.DeviceRegistry;
 
 
 public class ArtNetMapping {
@@ -33,8 +34,8 @@ public class ArtNetMapping {
     return this.mapping.get(loc);
   }
 
-  public void GenerateMapping(List<PixelPusher> pushers) {
-    GenerateMapping(pushers, false);
+  public void generateMapping(List<PixelPusher> pushers) {
+    generateMapping(pushers, false);
   }
 
   public InetAddress getSacnMulticast(int universe) {
@@ -52,7 +53,8 @@ public class ArtNetMapping {
 	}
   }
   
-  public void GenerateMapping(List<PixelPusher> pushers, boolean pack) {
+  public void generateMapping(List<PixelPusher> pushers, boolean pack) {
+	DeviceRegistry registry = ArtNetBridge.registry;
     for (PixelPusher pusher : pushers) {
       int startingChannel = pusher.getArtnetChannel();
       int startingUniverse = pusher.getArtnetUniverse();
@@ -87,19 +89,19 @@ public class ArtNetMapping {
     				+ (currentChannel + 4) + "] -> PixelPusher: [" + currentStrip
     				+ ", " + currentPixel + "] at multicast "+location);
     		mapping.put(new ArtNetLocation(currentUniverse, currentChannel+ArtNetBridge.order.getOffset(ColourOrdering.RED), location),
-    				new PixelPusherLocation(pusher.getStrip(currentStrip),
+    				new PixelPusherLocation(registry, pusher.getMacAddress(), currentStrip,
     				currentPixel, PixelPusherLocation.Channel.RED));
     		mapping.put(new ArtNetLocation(currentUniverse, currentChannel+ArtNetBridge.order.getOffset(ColourOrdering.GREEN), location),
-    				new PixelPusherLocation(pusher.getStrip(currentStrip),
+    				new PixelPusherLocation(registry, pusher.getMacAddress(), currentStrip,
     				currentPixel, PixelPusherLocation.Channel.GREEN));
     		mapping.put(new ArtNetLocation(currentUniverse, currentChannel+ArtNetBridge.order.getOffset(ColourOrdering.BLUE), location),
-    				new PixelPusherLocation(pusher.getStrip(currentStrip),
+    				new PixelPusherLocation(registry, pusher.getMacAddress(), currentStrip,
     			    currentPixel, PixelPusherLocation.Channel.BLUE));
     		mapping.put(new ArtNetLocation(currentUniverse, currentChannel + 3, location),
-    				new PixelPusherLocation(pusher.getStrip(currentStrip),
+    				new PixelPusherLocation(registry, pusher.getMacAddress(), currentStrip,
     			    currentPixel, PixelPusherLocation.Channel.ORANGE));
     		mapping.put(new ArtNetLocation(currentUniverse, currentChannel + 4, location),
-    				new PixelPusherLocation(pusher.getStrip(currentStrip),
+    				new PixelPusherLocation(registry, pusher.getMacAddress(), currentStrip,
     			    currentPixel, PixelPusherLocation.Channel.WHITE));
     		pusher.setLastUniverse(currentUniverse);
     		if (!multicastAddresses.contains(location))
@@ -111,13 +113,13 @@ public class ArtNetMapping {
     				+ (currentChannel + 2) + "] -> PixelPusher: [" + currentStrip
     				+ ", " + currentPixel + "] at multicast "+location);
     		mapping.put(new ArtNetLocation(currentUniverse, currentChannel+ArtNetBridge.order.getOffset(ColourOrdering.RED), location),
-    				new PixelPusherLocation(pusher.getStrip(currentStrip),
+    				new PixelPusherLocation(registry, pusher.getMacAddress(), currentStrip,
     				currentPixel, PixelPusherLocation.Channel.RED));
     		mapping.put(new ArtNetLocation(currentUniverse, currentChannel +ArtNetBridge.order.getOffset(ColourOrdering.GREEN), location),
-    				new PixelPusherLocation(pusher.getStrip(currentStrip),
+    				new PixelPusherLocation(registry, pusher.getMacAddress(), currentStrip,
     				currentPixel, PixelPusherLocation.Channel.GREEN));
     		mapping.put(new ArtNetLocation(currentUniverse, currentChannel +ArtNetBridge.order.getOffset(ColourOrdering.BLUE), location),
-    				new PixelPusherLocation(pusher.getStrip(currentStrip),
+    				new PixelPusherLocation(registry, pusher.getMacAddress(), currentStrip,
     			    currentPixel, PixelPusherLocation.Channel.BLUE));
     		pusher.setLastUniverse(currentUniverse);
     		if (!multicastAddresses.contains(location))

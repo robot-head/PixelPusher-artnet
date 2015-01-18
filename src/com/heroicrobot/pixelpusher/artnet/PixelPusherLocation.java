@@ -1,9 +1,14 @@
 package com.heroicrobot.pixelpusher.artnet;
 
-import com.heroicrobot.dropbit.devices.pixelpusher.Strip;
+import java.util.Map;
+
+import com.heroicrobot.dropbit.devices.pixelpusher.*;
+import com.heroicrobot.dropbit.registry.DeviceRegistry;
 
 public class PixelPusherLocation {
-  private Strip strip;
+  private String macAddr;
+  private DeviceRegistry registry; 
+  private int strip;
   private int pixel;
   private Channel channel;
 
@@ -11,7 +16,9 @@ public class PixelPusherLocation {
     RED, GREEN, BLUE, ORANGE, WHITE
   }
 
-  public PixelPusherLocation(Strip strip, int pixel, Channel channel) {
+  public PixelPusherLocation(DeviceRegistry registry, String macAddr, int strip, int pixel, Channel channel) {
+	this.registry = registry;
+	this.macAddr = macAddr;
     this.strip = strip;
     this.pixel = pixel;
     this.channel = channel;
@@ -21,7 +28,8 @@ public class PixelPusherLocation {
    * @return the strip
    */
   public Strip getStrip() {
-    return strip;
+	Map<String, PixelPusher> t = registry.getPusherMap();
+	return t.get(macAddr).getStrip(strip);
   }
 
   /**
@@ -29,7 +37,8 @@ public class PixelPusherLocation {
    *          the strip to set
    */
   public void setStrip(Strip strip) {
-    this.strip = strip;
+	this.macAddr = strip.getPusher().getMacAddress();
+    this.strip = strip.getStripNumber();
   }
 
   /**
