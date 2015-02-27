@@ -329,8 +329,8 @@ public class ArtNetReceiver extends Thread {
         System.out.println("Got an artnet packet!");
         this.seenPacket = true;
       }
-      int universe = (buf[14] | (buf[15] << 8)) + 1;
-      int length = (buf[17] | buf[16] <<8);
+      int universe = ((buf[14] & 0xff) | (buf[15] << 8)) + 1;
+      int length = ((buf[17] & 0xff) | buf[16] <<8);
       int length_bytes = 18+length;
       if (length < 2) {
     	  System.err.println("Received short Art-Net packet.");
