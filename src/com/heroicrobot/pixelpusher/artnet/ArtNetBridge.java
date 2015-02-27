@@ -63,7 +63,7 @@ public class ArtNetBridge {
     sacnReceiver.start();
     
     registry.startPushing();
-    registry.setAutoThrottle(true);
+    registry.setAutoThrottle(false);
 
   }
 }
