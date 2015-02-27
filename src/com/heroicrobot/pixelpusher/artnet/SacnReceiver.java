@@ -124,7 +124,7 @@ public class SacnReceiver extends Thread {
 		        System.out.println("sACN:  Got an sACN packet!");
 		        this.seenPacket = true;
 		      }
-		      int universe = (buf[114] | (buf[113] << 8));
+		      int universe = ((buf[114] & 0xff) | ((buf[113] & 0xff) << 8));
 		      //System.out.println("Universe = "+universe);
 		      for (int i = 0; i < 512; i++) {
 		        // the channel data is in buf[i+126];
